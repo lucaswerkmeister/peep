@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="Project_Euler_Eclipse_Plugin"
+            name="Project Euler">
+      </category>
+      <wizard
+            category="Project_Euler_Eclipse_Plugin"
+            class="project_euler_eclipse_plugin.wizards.NewProblemWizard"
+            icon="icons/sample.gif"
+            id="project_euler_eclipse_plugin.wizards.NewProblemWizard"
+            name="Project Euler Problem">
+      </wizard>
+   </extension>
+
+</plugin>
