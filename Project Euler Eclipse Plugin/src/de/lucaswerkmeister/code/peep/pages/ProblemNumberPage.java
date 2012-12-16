@@ -1,4 +1,4 @@
-package project_euler_eclipse_plugin.wizards;
+package de.lucaswerkmeister.code.peep.pages;
 
 import java.text.NumberFormat;
 
@@ -159,5 +159,9 @@ public class ProblemNumberPage extends WizardPage {
 		NumberFormat n = NumberFormat.getIntegerInstance();
 		n.setMinimumIntegerDigits(3);
 		return "Problem" + n.format(problemNumber.getSelection()) + ".java";
+	}
+
+	public int getProblemNumber() {
+		return problemNumber.getSelection();
 	}
 }

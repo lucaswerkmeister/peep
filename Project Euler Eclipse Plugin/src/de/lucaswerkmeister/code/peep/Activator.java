@@ -1,4 +1,4 @@
-package project_euler_eclipse_plugin;
+package de.lucaswerkmeister.code.peep;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;

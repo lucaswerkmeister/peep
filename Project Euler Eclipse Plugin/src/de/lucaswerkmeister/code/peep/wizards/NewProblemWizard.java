@@ -1,9 +1,14 @@
-package project_euler_eclipse_plugin.wizards;
+package de.lucaswerkmeister.code.peep.wizards;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.NumberFormat;
+import java.util.Scanner;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -27,6 +32,8 @@ import org.eclipse.ui.IWorkbenchWizard;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
+
+import de.lucaswerkmeister.code.peep.pages.ProblemNumberPage;
 
 /**
  * This is a sample new wizard. Its role is to create a new file resource in the
@@ -65,11 +72,12 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	public boolean performFinish() {
 		final String containerName = page.getContainerName();
 		final String fileName = page.getFileName();
+		final int problemNumber = page.getProblemNumber();
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor)
 					throws InvocationTargetException {
 				try {
-					doFinish(containerName, fileName, monitor);
+					doFinish(containerName, fileName, problemNumber, monitor);
 				} catch (CoreException e) {
 					throw new InvocationTargetException(e);
 				} finally {
@@ -97,7 +105,7 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	 */
 
 	private void doFinish(String containerName, String fileName,
-			IProgressMonitor monitor) throws CoreException {
+			int problemNumber, IProgressMonitor monitor) throws CoreException {
 		// create a sample file
 		monitor.beginTask("Creating " + fileName, 2);
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
@@ -109,7 +117,7 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 		IContainer container = (IContainer) resource;
 		final IFile file = container.getFile(new Path(fileName));
 		try {
-			InputStream stream = openContentStream();
+			InputStream stream = openContentStream(problemNumber, container);
 			if (file.exists()) {
 				file.setContents(stream, true, true, monitor);
 			} else {
@@ -137,8 +145,75 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	 * We will initialize file contents with a sample text.
 	 */
 
-	private InputStream openContentStream() {
-		String contents = "This is the initial file contents for *.java file that should be word-sorted in the Preview page of the multi-page editor";
+	private InputStream openContentStream(int problemNumber,
+			IContainer container) {
+		String contents = null;
+		byte readTimeoutCounter = 0;
+
+		do {
+			try (Scanner scan = new Scanner(container
+					.findMember("/Problem.template").getLocation().toFile())) {
+				scan.useDelimiter("\\Z");
+				contents = scan.next();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			readTimeoutCounter++;
+		} while (contents == null && readTimeoutCounter < 10);
+		if (contents == null)
+			return new ByteArrayInputStream(
+					"Unable to find template file, sorry".getBytes());
+		if (contents.contains("&PROBLEMTEXT_HTML;")) {
+			String problemText_html = null;
+			readTimeoutCounter = 0;
+			do {
+				try (Scanner problemPageScanner = new Scanner(
+						new URL("http://www.projecteuler.net/problem="
+								+ problemNumber).openStream())) {
+					problemPageScanner.useDelimiter("\\Z");
+					String fullProblem = problemPageScanner.next();
+
+					String problemWithoutStart = fullProblem
+							.substring(fullProblem
+									.indexOf("<div class=\"problem_content\" role=\"problem\">")
+									+ "<div class=\"problem_content\" role=\"problem\">"
+											.length());
+
+					int index;
+					// deal with inner DIVs
+					for (index = problemWithoutStart.indexOf("</div>"); problemWithoutStart
+							.substring(0, index).contains("<div"); index = problemWithoutStart
+							.indexOf("</div>", index + 1)) {
+						problemWithoutStart = problemWithoutStart.replaceFirst(
+								"<div", ">DIV");
+					}
+					problemText_html = problemWithoutStart.substring(0, index)
+							.replaceAll(">DIV", "<div");
+
+					problemText_html = problemText_html.trim();
+
+					readTimeoutCounter++;
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} while (problemText_html == null && readTimeoutCounter < 10);
+			if (problemText_html == null)
+				problemText_html = "Unable to retreive problem text, sorry";
+			contents = contents.replace("&PROBLEMTEXT_HTML;", problemText_html);
+
+			NumberFormat n = NumberFormat.getInstance();
+			n.setMinimumIntegerDigits(3);
+			contents = contents.replace("&PROBLEMNUMBER;",
+					n.format(problemNumber));
+
+			contents = contents.replace("&AUTHOR;", "Lucas"); // TODO this is
+																// obviously not
+																// the right way
+																// to do it
+		}
+
 		return new ByteArrayInputStream(contents.getBytes());
 	}
 

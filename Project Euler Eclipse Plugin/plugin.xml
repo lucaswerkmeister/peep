@@ -16,9 +16,9 @@
       </category>
       <wizard
             category="Project_Euler_Eclipse_Plugin"
-            class="project_euler_eclipse_plugin.wizards.NewProblemWizard"
+            class="de.lucaswerkmeister.code.peep.wizards.NewProblemWizard"
             icon="icons/sample.gif"
-            id="project_euler_eclipse_plugin.wizards.NewProblemWizard"
+            id="de.lucaswerkmeister.code.peep.wizards.NewProblemWizard"
             name="Project Euler Problem">
       </wizard>
    </extension>

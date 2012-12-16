@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Project_Euler_Eclipse_Plugin
-Bundle-SymbolicName: Project_Euler_Eclipse_Plugin; singleton:=true
+Bundle-Name: Project Euler Eclipse Plugin
+Bundle-SymbolicName: de.lucaswerkmeister.code.peep;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: project_euler_eclipse_plugin.Activator
+Bundle-Activator: de.lucaswerkmeister.code.peep.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
