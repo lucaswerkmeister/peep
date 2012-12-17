@@ -208,10 +208,8 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 			contents = contents.replace("&PROBLEMNUMBER;",
 					n.format(problemNumber));
 
-			contents = contents.replace("&AUTHOR;", "Lucas"); // TODO this is
-																// obviously not
-																// the right way
-																// to do it
+			contents = contents.replace("&USERNAME;",
+					System.getProperty("user.name"));
 		}
 
 		return new ByteArrayInputStream(contents.getBytes());
