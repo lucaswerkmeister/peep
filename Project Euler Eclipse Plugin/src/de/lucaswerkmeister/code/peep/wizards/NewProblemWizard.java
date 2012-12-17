@@ -36,12 +36,17 @@ import org.eclipse.ui.ide.IDE;
 import de.lucaswerkmeister.code.peep.pages.ProblemNumberPage;
 
 /**
- * This is a sample new wizard. Its role is to create a new file resource in the
- * provided container. If the container resource (a folder or a project) is
- * selected in the workspace when the wizard is opened, it will accept it as the
- * target container. The wizard creates one file with the extension "java". If a
- * sample multi-page editor (also available as a template) is registered for the
- * same extension, it will be able to open it.
+ * This wizard creates a new class from a user-defined template in the same
+ * directory by replacing certain tags of said template with actual content. The
+ * currently supported tags are:
+ * <ul>
+ * <li><code>&PROBLEMNUMBER;</code> the problem number, three decimal digits
+ * (015).</li>
+ * <li><code>&USERNAME;</code> the user name, just as in eclipse's variable
+ * ${USER}.</li>
+ * <li><code>&PROBLEMTEXT_HTML;</code> the problem's text, fetched from the
+ * projecteuler.net page.</li>
+ * </ul>
  */
 
 public class NewProblemWizard extends Wizard implements INewWizard {
@@ -142,7 +147,8 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * We will initialize file contents with a sample text.
+	 * We will initialize file contents the template contents and then replace
+	 * the variables.
 	 */
 
 	private InputStream openContentStream(int problemNumber,
@@ -201,14 +207,15 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 			} while (problemText_html == null && readTimeoutCounter < 10);
 			if (problemText_html == null)
 				problemText_html = "Unable to retreive problem text, sorry";
-			contents = contents.replace("&PROBLEMTEXT_HTML;", problemText_html);
+			contents = contents.replaceAll("&PROBLEMTEXT_HTML;",
+					problemText_html);
 
 			NumberFormat n = NumberFormat.getInstance();
 			n.setMinimumIntegerDigits(3);
-			contents = contents.replace("&PROBLEMNUMBER;",
+			contents = contents.replaceAll("&PROBLEMNUMBER;",
 					n.format(problemNumber));
 
-			contents = contents.replace("&USERNAME;",
+			contents = contents.replaceAll("&USERNAME;",
 					System.getProperty("user.name"));
 		}
 
