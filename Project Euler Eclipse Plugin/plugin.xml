@@ -21,14 +21,14 @@
          point="org.eclipse.ui.newWizards">
       <category
             id="Project_Euler_Eclipse_Plugin"
-            name="Project Euler">
+            name="%category.name">
       </category>
       <wizard
             category="Project_Euler_Eclipse_Plugin"
             class="de.lucaswerkmeister.code.peep.wizards.NewProblemWizard"
             icon="icons/pe_new.png"
             id="de.lucaswerkmeister.code.peep.wizards.NewProblemWizard"
-            name="Project Euler Problem">
+            name="%wizard.name">
       </wizard>
    </extension>
 
