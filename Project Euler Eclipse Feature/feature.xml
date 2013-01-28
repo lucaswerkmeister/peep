@@ -2,7 +2,7 @@
 <feature
       id="de.lucaswerkmeister.code.peep.feature"
       label="Project Euler Eclipse Feature"
-      version="1.0.0.1">
+      version="1.0.1.0">
 
    <description>
       The Project Euler Eclipse Feature includes a plugin for simple
@@ -864,7 +864,7 @@ Public License instead of this License.  But first, please read
    </url>
 
    <plugin
-         id="de.lucaswerkmeister.code.peep"
+         id="de.lucaswerkmeister.code.peep.plugin"
          download-size="0"
          install-size="0"
          version="0.0.0"
