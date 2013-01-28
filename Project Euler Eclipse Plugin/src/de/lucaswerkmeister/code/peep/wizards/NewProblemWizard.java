@@ -36,22 +36,18 @@ import org.eclipse.ui.ide.IDE;
 import de.lucaswerkmeister.code.peep.pages.ProblemNumberPage;
 
 /**
- * This wizard creates a new class from a user-defined template in the same
- * directory by replacing certain tags of said template with actual content. The
- * currently supported tags are:
+ * This wizard creates a new class from a user-defined template in the same directory by replacing certain tags of said
+ * template with actual content. The currently supported tags are:
  * <ul>
- * <li><code>&PROBLEMNUMBER;</code> the problem number, three decimal digits
- * (015).</li>
- * <li><code>&USERNAME;</code> the user name, just as in eclipse's variable
- * ${USER}.</li>
- * <li><code>&PROBLEMTEXT_HTML;</code> the problem's text, fetched from the
- * projecteuler.net page.</li>
+ * <li><code>&PROBLEMNUMBER;</code> the problem number, three decimal digits (015).</li>
+ * <li><code>&USERNAME;</code> the user name, just as in eclipse's variable ${USER}.</li>
+ * <li><code>&PROBLEMTEXT_HTML;</code> the problem's text, fetched from the projecteuler.net page.</li>
  * </ul>
  */
 
 public class NewProblemWizard extends Wizard implements INewWizard {
-	private ProblemNumberPage page;
-	private ISelection selection;
+	private ProblemNumberPage	page;
+	private ISelection			selection;
 
 	/**
 	 * Constructor for NewProblemWizard.
@@ -71,8 +67,8 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * This method is called when 'Finish' button is pressed in the wizard. We
-	 * will create an operation and run it using wizard as execution context.
+	 * This method is called when 'Finish' button is pressed in the wizard. We will create an operation and run it using
+	 * wizard as execution context.
 	 */
 	public boolean performFinish() {
 		final String containerName = page.getContainerName();
@@ -83,18 +79,22 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 					throws InvocationTargetException {
 				try {
 					doFinish(containerName, fileName, problemNumber, monitor);
-				} catch (CoreException e) {
+				}
+				catch (CoreException e) {
 					throw new InvocationTargetException(e);
-				} finally {
+				}
+				finally {
 					monitor.done();
 				}
 			}
 		};
 		try {
 			getContainer().run(true, false, op);
-		} catch (InterruptedException e) {
+		}
+		catch (InterruptedException e) {
 			return false;
-		} catch (InvocationTargetException e) {
+		}
+		catch (InvocationTargetException e) {
 			Throwable realException = e.getTargetException();
 			MessageDialog.openError(getShell(), "Error",
 					realException.getMessage());
@@ -104,9 +104,8 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * The worker method. It will find the container, create the file if missing
-	 * or just replace its contents, and open the editor on the newly created
-	 * file.
+	 * The worker method. It will find the container, create the file if missing or just replace its contents, and open
+	 * the editor on the newly created file.
 	 */
 
 	private void doFinish(String containerName, String fileName,
@@ -125,11 +124,13 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 			InputStream stream = openContentStream(problemNumber, container);
 			if (file.exists()) {
 				file.setContents(stream, true, true, monitor);
-			} else {
+			}
+			else {
 				file.create(stream, true, monitor);
 			}
 			stream.close();
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 		}
 		monitor.worked(1);
 		monitor.setTaskName("Opening file for editing...");
@@ -139,7 +140,8 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 						.getActiveWorkbenchWindow().getActivePage();
 				try {
 					IDE.openEditor(page, file, true);
-				} catch (PartInitException e) {
+				}
+				catch (PartInitException e) {
 				}
 			}
 		});
@@ -147,8 +149,7 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * We will initialize file contents the template contents and then replace
-	 * the variables.
+	 * We will initialize file contents the template contents and then replace the variables.
 	 */
 
 	private InputStream openContentStream(int problemNumber,
@@ -161,7 +162,8 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 					.findMember("/Problem.template").getLocation().toFile())) {
 				scan.useDelimiter("\\Z");
 				contents = scan.next();
-			} catch (FileNotFoundException e) {
+			}
+			catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
 			readTimeoutCounter++;
@@ -199,9 +201,11 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 					problemText_html = problemText_html.trim();
 
 					readTimeoutCounter++;
-				} catch (MalformedURLException e) {
+				}
+				catch (MalformedURLException e) {
 					e.printStackTrace();
-				} catch (IOException e) {
+				}
+				catch (IOException e) {
 					e.printStackTrace();
 				}
 			} while (problemText_html == null && readTimeoutCounter < 10);
@@ -210,14 +214,21 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 			contents = contents.replaceAll("&PROBLEMTEXT_HTML;",
 					problemText_html);
 
-			NumberFormat n = NumberFormat.getInstance();
-			n.setMinimumIntegerDigits(3);
-			contents = contents.replaceAll("&PROBLEMNUMBER;",
-					n.format(problemNumber));
-
-			contents = contents.replaceAll("&USERNAME;",
-					System.getProperty("user.name"));
+			// Project Euler uses small gifs for symbols like times, mapsto etc. This replaces them with their given
+			// 'alt'.
+			contents = contents
+					.replaceAll(
+							"<img\\ssrc='images/symbol_.*\\.gif'\\swidth='\\p{Digit}*'\\sheight='\\p{Digit}*'\\s"
+									+ "alt='(.*)'\\sborder='\\p{Digit}*'\\sstyle='vertical-align:middle;'\\s/>",
+							"$1");
 		}
+		NumberFormat n = NumberFormat.getInstance();
+		n.setMinimumIntegerDigits(3);
+		contents = contents.replaceAll("&PROBLEMNUMBER;",
+				n.format(problemNumber));
+
+		contents = contents.replaceAll("&USERNAME;",
+				System.getProperty("user.name"));
 
 		return new ByteArrayInputStream(contents.getBytes());
 	}
@@ -229,8 +240,7 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * We will accept the selection in the workbench to see if we can initialize
-	 * from it.
+	 * We will accept the selection in the workbench to see if we can initialize from it.
 	 * 
 	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
 	 */
