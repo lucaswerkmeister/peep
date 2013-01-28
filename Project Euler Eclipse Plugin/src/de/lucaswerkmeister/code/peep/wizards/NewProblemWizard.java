@@ -231,6 +231,8 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 		contents = contents.replaceAll("&USERNAME;",
 				System.getProperty("user.name"));
 
+		contents = contents.replaceAll("&PROBLEMLINK;", "http://www.projecteuler.net/problem=" + problemNumber);
+
 		return new ByteArrayInputStream(contents.getBytes());
 	}
 
