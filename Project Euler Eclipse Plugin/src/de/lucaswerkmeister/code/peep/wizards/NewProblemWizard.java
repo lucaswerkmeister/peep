@@ -214,13 +214,14 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 			contents = contents.replaceAll("&PROBLEMTEXT_HTML;",
 					problemText_html);
 
-			// Project Euler uses small gifs for symbols like times, mapsto etc. This replaces them with their given
-			// 'alt'.
+			// Project Euler uses small gifs for symbols like times etc; we replace them with their given 'alt'.
 			contents = contents
 					.replaceAll(
-							"<img\\ssrc='images/symbol_.*\\.gif'\\swidth='\\p{Digit}*'\\sheight='\\p{Digit}*'\\s"
-									+ "alt='(.*)'\\sborder='\\p{Digit}*'\\sstyle='vertical-align:middle;'\\s/>",
+							"<img[^>]*src='images/symbol_.*\\.gif'[^>]*alt='(&\\p{Alpha}*;)'[^>]*/>",
 							"$1");
+
+			// Replace all other image links with direct links to projecteuler.net
+			contents = contents.replaceAll("(<img[^>]*src=\")(project/[^\"]*\")", "$1http://projecteuler.net/$2");
 		}
 		NumberFormat n = NumberFormat.getInstance();
 		n.setMinimumIntegerDigits(3);
