@@ -27,7 +27,6 @@ import org.eclipse.swt.widgets.Spinner;
  * as the file name. The page will only accept file name without the extension
  * OR with the extension that matches the expected one (java).
  */
-
 public class ProblemNumberPage extends WizardPage {
 	private Spinner problemNumber;
 	private IPath containerPath;
@@ -35,9 +34,10 @@ public class ProblemNumberPage extends WizardPage {
 	private ISelection selection;
 
 	/**
-	 * Constructor for SampleNewWizardPage.
+	 * Constructor for ProblemNumberPage.
 	 * 
-	 * @param pageName
+	 * @param selection
+	 *            The selection.
 	 */
 	public ProblemNumberPage(ISelection selection) {
 		super("wizardPage");
@@ -101,7 +101,6 @@ public class ProblemNumberPage extends WizardPage {
 	/**
 	 * Tests if the current workbench selection is a suitable container to use.
 	 */
-
 	private void initialize() {
 		if (selection != null && selection.isEmpty() == false
 				&& selection instanceof IStructuredSelection) {
@@ -124,7 +123,6 @@ public class ProblemNumberPage extends WizardPage {
 	/**
 	 * Ensures that the problem number is valid.
 	 */
-
 	private void dialogChanged() {
 		IResource resource = ResourcesPlugin.getWorkspace().getRoot()
 				.findMember(new Path(getContainerName()));

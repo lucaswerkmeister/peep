@@ -64,15 +64,14 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	/**
 	 * Adding the page to the wizard.
 	 */
-
 	public void addPages() {
 		page = new ProblemNumberPage(selection);
 		addPage(page);
 	}
 
 	/**
-	 * This method is called when 'Finish' button is pressed in the wizard. We
-	 * will create an operation and run it using wizard as execution context.
+	 * This method is called when the 'Finish' button is pressed in the wizard.
+	 * We will create an operation and run it using wizard as execution context.
 	 */
 	public boolean performFinish() {
 		final String containerName = page.getContainerName();
@@ -96,7 +95,6 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 			return false;
 		} catch (InvocationTargetException e) {
 			Throwable realException = e.getTargetException();
-			realException.printStackTrace();
 			MessageDialog.openError(getShell(), "Error",
 					realException.getMessage());
 			return false;
@@ -109,7 +107,6 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	 * or just replace its contents, and open the editor on the newly created
 	 * file.
 	 */
-
 	private void doFinish(String containerName, String fileName,
 			int problemNumber, IProgressMonitor monitor) throws CoreException {
 		// create a sample file
@@ -122,8 +119,7 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 		}
 		IContainer container = (IContainer) resource;
 		final IFile file = container.getFile(new Path(fileName));
-		try {
-			InputStream stream = openContentStream(problemNumber, container);
+		try (InputStream stream = openContentStream(problemNumber, container)) {
 			if (file.exists()) {
 				file.setContents(stream, true, true, monitor);
 			} else {
@@ -148,12 +144,12 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * We will initialize file contents the template contents and then replace
+	 * We initialize file contents with the template contents and then replace
 	 * the variables.
 	 * 
 	 * @throws FileNotFoundException
+	 *             If the template file doesn't exist.
 	 */
-
 	private InputStream openContentStream(int problemNumber,
 			IContainer container) throws FileNotFoundException {
 		String contents = null;
@@ -172,7 +168,7 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 		} while (contents == null && readTimeoutCounter < 10);
 		if (contents == null)
 			return new ByteArrayInputStream(
-					"Unable to find template file, sorry".getBytes());
+					"Unable to find template file, sorry.".getBytes());
 		if (contents.contains("&PROBLEMTEXT_HTML;")) {
 			String problemText_html = null;
 			readTimeoutCounter = 0;
