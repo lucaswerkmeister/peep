@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/de.lucaswerkmeister.code.peep.feature_1.0.1.0.jar" id="de.lucaswerkmeister.code.peep.feature" version="1.0.1.0"/>
+   <feature url="features/de.lucaswerkmeister.code.peep.feature_1.0.1.1.jar" id="de.lucaswerkmeister.code.peep.feature" version="1.0.1.1"/>
 </site>
