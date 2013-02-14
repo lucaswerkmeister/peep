@@ -214,7 +214,7 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 			// replace them with their given 'alt'.
 			contents = contents
 					.replaceAll(
-							"<img[^>]*src='images/symbol_.*\\.gif'[^>]*alt='(&\\p{Alpha}*;)'[^>]*/>",
+							"<img[^>]*src='images/symbol_[^']*\\.gif'[^>]*alt='(&\\p{Alpha}*;)'[^>]*/>",
 							"$1");
 
 			// Replace all other image links with direct links to
