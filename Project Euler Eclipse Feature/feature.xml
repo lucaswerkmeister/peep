@@ -2,7 +2,7 @@
 <feature
       id="de.lucaswerkmeister.code.peep.feature"
       label="Project Euler Eclipse Feature"
-      version="1.0.1.1">
+      version="1.0.1.2">
 
    <description>
       The Project Euler Eclipse Feature includes a plugin for simple
