@@ -38,7 +38,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
-import de.lucaswerkmeister.peep.core.extensionPoints.PeepTask;
+import de.lucaswerkmeister.peep.core.extensionPoints.CreateTask;
 import de.lucaswerkmeister.peep.core.pages.ProblemNumberPage;
 
 /**
@@ -111,7 +111,8 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 		return true;
 	}
 
-	private void runTasks(final String extensionPointId, final IProject project, final int problemNumber) {
+	private void runTasks(final String extensionPointId, final IProject project,
+			final IFile file, final int problemNumber) {
 		for (IConfigurationElement e : Platform.getExtensionRegistry().getConfigurationElementsFor(extensionPointId)) {
 			final Object extension;
 			try {
@@ -120,11 +121,11 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 			catch (CoreException e1) {
 				continue;
 			}
-			if (extension instanceof PeepTask)
+			if (extension instanceof CreateTask)
 				SafeRunner.run(new ISafeRunnable() {
 					@Override
 					public void run() throws Exception {
-						((PeepTask) extension).execute(project, problemNumber);
+						((CreateTask) extension).execute(project, file, problemNumber);
 					}
 
 					@Override
@@ -141,11 +142,8 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	 */
 	private void doFinish(IProject project, String containerName, String fileName,
 			int problemNumber, IProgressMonitor monitor) throws CoreException {
-		// create a sample file
 		monitor.beginTask("Creating " + fileName, 4);
 		monitor.setTaskName("Running extensions");
-		runTasks(BEFORE_CREATE_ID, project, problemNumber);
-		monitor.worked(1);
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IResource resource = root.findMember(new Path(containerName));
 		if (!resource.exists() || !(resource instanceof IContainer)) {
@@ -154,6 +152,8 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 		}
 		IContainer container = (IContainer) resource;
 		final IFile file = container.getFile(new Path(fileName));
+		runTasks(BEFORE_CREATE_ID, project, file, problemNumber);
+		monitor.worked(1);
 		try (InputStream stream = openContentStream(problemNumber, container, monitor)) {
 			if (file.exists()) {
 				file.setContents(stream, true, true, monitor);
@@ -167,7 +167,7 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 		}
 		monitor.worked(1);
 		monitor.setTaskName("Running extensions");
-		runTasks(AFTER_CREATE_ID, project, problemNumber);
+		runTasks(AFTER_CREATE_ID, project, file, problemNumber);
 		getShell().getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				IWorkbenchPage page = PlatformUI.getWorkbench()
