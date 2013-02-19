@@ -36,18 +36,22 @@ import org.eclipse.ui.ide.IDE;
 import de.lucaswerkmeister.code.peep.pages.ProblemNumberPage;
 
 /**
- * This wizard creates a new class from a user-defined template in the same directory by replacing certain tags of said
- * template with actual content. The currently supported tags are:
+ * This wizard creates a new class from a user-defined template in the same
+ * directory by replacing certain tags of said template with actual content. The
+ * currently supported tags are:
  * <ul>
- * <li><code>&PROBLEMNUMBER;</code> the problem number, three decimal digits (015).</li>
- * <li><code>&USERNAME;</code> the user name, just as in eclipse's variable ${USER}.</li>
- * <li><code>&PROBLEMTEXT_HTML;</code> the problem's text, fetched from the projecteuler.net page.</li>
+ * <li><code>&PROBLEMNUMBER;</code> the problem number, three decimal digits
+ * (015).</li>
+ * <li><code>&USERNAME;</code> the user name, just as in eclipse's variable
+ * ${USER}.</li>
+ * <li><code>&PROBLEMTEXT_HTML;</code> the problem's text, fetched from the
+ * projecteuler.net page.</li>
  * </ul>
  */
 
 public class NewProblemWizard extends Wizard implements INewWizard {
-	private ProblemNumberPage	page;
-	private ISelection			selection;
+	private ProblemNumberPage page;
+	private ISelection selection;
 
 	/**
 	 * Constructor for NewProblemWizard.
@@ -60,15 +64,14 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	/**
 	 * Adding the page to the wizard.
 	 */
-
 	public void addPages() {
 		page = new ProblemNumberPage(selection);
 		addPage(page);
 	}
 
 	/**
-	 * This method is called when 'Finish' button is pressed in the wizard. We will create an operation and run it using
-	 * wizard as execution context.
+	 * This method is called when the 'Finish' button is pressed in the wizard.
+	 * We will create an operation and run it using wizard as execution context.
 	 */
 	public boolean performFinish() {
 		final String containerName = page.getContainerName();
@@ -79,22 +82,18 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 					throws InvocationTargetException {
 				try {
 					doFinish(containerName, fileName, problemNumber, monitor);
-				}
-				catch (CoreException e) {
+				} catch (CoreException e) {
 					throw new InvocationTargetException(e);
-				}
-				finally {
+				} finally {
 					monitor.done();
 				}
 			}
 		};
 		try {
 			getContainer().run(true, false, op);
-		}
-		catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			return false;
-		}
-		catch (InvocationTargetException e) {
+		} catch (InvocationTargetException e) {
 			Throwable realException = e.getTargetException();
 			MessageDialog.openError(getShell(), "Error",
 					realException.getMessage());
@@ -104,10 +103,10 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * The worker method. It will find the container, create the file if missing or just replace its contents, and open
-	 * the editor on the newly created file.
+	 * The worker method. It will find the container, create the file if missing
+	 * or just replace its contents, and open the editor on the newly created
+	 * file.
 	 */
-
 	private void doFinish(String containerName, String fileName,
 			int problemNumber, IProgressMonitor monitor) throws CoreException {
 		// create a sample file
@@ -120,17 +119,14 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 		}
 		IContainer container = (IContainer) resource;
 		final IFile file = container.getFile(new Path(fileName));
-		try {
-			InputStream stream = openContentStream(problemNumber, container);
+		try (InputStream stream = openContentStream(problemNumber, container)) {
 			if (file.exists()) {
 				file.setContents(stream, true, true, monitor);
-			}
-			else {
+			} else {
 				file.create(stream, true, monitor);
 			}
 			stream.close();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 		}
 		monitor.worked(1);
 		monitor.setTaskName("Opening file for editing...");
@@ -140,8 +136,7 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 						.getActiveWorkbenchWindow().getActivePage();
 				try {
 					IDE.openEditor(page, file, true);
-				}
-				catch (PartInitException e) {
+				} catch (PartInitException e) {
 				}
 			}
 		});
@@ -149,28 +144,31 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * We will initialize file contents the template contents and then replace the variables.
+	 * We initialize file contents with the template contents and then replace
+	 * the variables.
+	 * 
+	 * @throws FileNotFoundException
+	 *             If the template file doesn't exist.
 	 */
-
 	private InputStream openContentStream(int problemNumber,
-			IContainer container) {
+			IContainer container) throws FileNotFoundException {
 		String contents = null;
 		byte readTimeoutCounter = 0;
 
 		do {
-			try (Scanner scan = new Scanner(container
-					.findMember("/Problem.template").getLocation().toFile())) {
+			IResource templateFile = container.findMember("/Problem.template");
+			if (templateFile == null)
+				throw new FileNotFoundException(
+						"Template file (\"Problem.template\") not found!");
+			try (Scanner scan = new Scanner(templateFile.getLocation().toFile())) {
 				scan.useDelimiter("\\Z");
 				contents = scan.next();
-			}
-			catch (FileNotFoundException e) {
-				e.printStackTrace();
 			}
 			readTimeoutCounter++;
 		} while (contents == null && readTimeoutCounter < 10);
 		if (contents == null)
 			return new ByteArrayInputStream(
-					"Unable to find template file, sorry".getBytes());
+					"Unable to find template file, sorry.".getBytes());
 		if (contents.contains("&PROBLEMTEXT_HTML;")) {
 			String problemText_html = null;
 			readTimeoutCounter = 0;
@@ -201,11 +199,9 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 					problemText_html = problemText_html.trim();
 
 					readTimeoutCounter++;
-				}
-				catch (MalformedURLException e) {
+				} catch (MalformedURLException e) {
 					e.printStackTrace();
-				}
-				catch (IOException e) {
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			} while (problemText_html == null && readTimeoutCounter < 10);
@@ -214,14 +210,18 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 			contents = contents.replaceAll("&PROBLEMTEXT_HTML;",
 					problemText_html);
 
-			// Project Euler uses small gifs for symbols like times etc; we replace them with their given 'alt'.
+			// Project Euler uses small gifs for symbols like times etc; we
+			// replace them with their given 'alt'.
 			contents = contents
 					.replaceAll(
-							"<img[^>]*src='images/symbol_.*\\.gif'[^>]*alt='(&\\p{Alpha}*;)'[^>]*/>",
+							"<img[^>]*src='images/symbol_[^']*\\.gif'[^>]*alt='(&\\p{Alpha}*;)'[^>]*/>",
 							"$1");
 
-			// Replace all other image links with direct links to projecteuler.net
-			contents = contents.replaceAll("(<img[^>]*src=\")(project/[^\"]*\")", "$1http://projecteuler.net/$2");
+			// Replace all other image links with direct links to
+			// projecteuler.net
+			contents = contents.replaceAll(
+					"(<img[^>]*src=\")(project/[^\"]*\")",
+					"$1http://projecteuler.net/$2");
 		}
 		NumberFormat n = NumberFormat.getInstance();
 		n.setMinimumIntegerDigits(3);
@@ -231,7 +231,8 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 		contents = contents.replaceAll("&USERNAME;",
 				System.getProperty("user.name"));
 
-		contents = contents.replaceAll("&PROBLEMLINK;", "http://www.projecteuler.net/problem=" + problemNumber);
+		contents = contents.replaceAll("&PROBLEMLINK;",
+				"http://www.projecteuler.net/problem=" + problemNumber);
 
 		return new ByteArrayInputStream(contents.getBytes());
 	}
@@ -243,7 +244,8 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * We will accept the selection in the workbench to see if we can initialize from it.
+	 * We will accept the selection in the workbench to see if we can initialize
+	 * from it.
 	 * 
 	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
 	 */

@@ -3,11 +3,12 @@ package de.lucaswerkmeister.code.peep.pages;
 import java.text.NumberFormat;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jdt.core.IOpenable;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jface.dialogs.IDialogPage;
 import org.eclipse.jface.viewers.ISelection;
@@ -26,7 +27,6 @@ import org.eclipse.swt.widgets.Spinner;
  * as the file name. The page will only accept file name without the extension
  * OR with the extension that matches the expected one (java).
  */
-
 public class ProblemNumberPage extends WizardPage {
 	private Spinner problemNumber;
 	private IPath containerPath;
@@ -34,9 +34,10 @@ public class ProblemNumberPage extends WizardPage {
 	private ISelection selection;
 
 	/**
-	 * Constructor for SampleNewWizardPage.
+	 * Constructor for ProblemNumberPage.
 	 * 
-	 * @param pageName
+	 * @param selection
+	 *            The selection.
 	 */
 	public ProblemNumberPage(ISelection selection) {
 		super("wizardPage");
@@ -100,7 +101,6 @@ public class ProblemNumberPage extends WizardPage {
 	/**
 	 * Tests if the current workbench selection is a suitable container to use.
 	 */
-
 	private void initialize() {
 		if (selection != null && selection.isEmpty() == false
 				&& selection instanceof IStructuredSelection) {
@@ -108,8 +108,14 @@ public class ProblemNumberPage extends WizardPage {
 			if (ssel.size() > 1)
 				return;
 			Object obj = ssel.getFirstElement();
-			if (obj instanceof IOpenable && obj instanceof IPackageFragment)
+			if (obj instanceof IPackageFragment)
 				containerPath = ((IPackageFragment) obj).getPath();
+			else if (obj instanceof IFolder)
+				containerPath = ((IFolder) obj).getFullPath()
+						.append("problems");
+			else if (obj instanceof IJavaProject)
+				containerPath = ((IJavaProject) obj).getPath().append("src")
+						.append("problems");
 		}
 		problemNumber.setValues(0, 0, 1000, 4, 1, 0);
 	}
@@ -117,7 +123,6 @@ public class ProblemNumberPage extends WizardPage {
 	/**
 	 * Ensures that the problem number is valid.
 	 */
-
 	private void dialogChanged() {
 		IResource resource = ResourcesPlugin.getWorkspace().getRoot()
 				.findMember(new Path(getContainerName()));
@@ -152,6 +157,8 @@ public class ProblemNumberPage extends WizardPage {
 	}
 
 	public String getContainerName() {
+		if (containerPath == null)
+			return null;
 		return containerPath.toString();
 	}
 
