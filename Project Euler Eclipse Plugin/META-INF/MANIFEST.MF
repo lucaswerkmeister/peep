@@ -11,6 +11,4 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Export-Package: de.lucaswerkmeister.peep,
- de.lucaswerkmeister.peep.pages,
- de.lucaswerkmeister.peep.wizards
+Export-Package: de.lucaswerkmeister.peep.extensionPoints
