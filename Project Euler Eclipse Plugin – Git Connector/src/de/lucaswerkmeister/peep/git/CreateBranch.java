@@ -2,18 +2,19 @@ package de.lucaswerkmeister.peep.git;
 
 import java.io.IOException;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.egit.core.project.RepositoryMapping;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 
-import de.lucaswerkmeister.peep.core.extensionPoints.PeepTask;
+import de.lucaswerkmeister.peep.core.extensionPoints.CreateTask;
 
-public class CreateBranch implements PeepTask {
+public class CreateBranch implements CreateTask {
 
 	@Override
-	public void execute(IProject project, int problemNumber) {
+	public void execute(IProject project, IFile file, int problemNumber) {
 		try {
 			Repository repo = RepositoryMapping.getMapping(project).getRepository();
 			Git git = new Git(repo);
