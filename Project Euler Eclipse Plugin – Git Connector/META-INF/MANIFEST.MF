@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Project Euler Eclipse Plugin – Git Connector
+Bundle-SymbolicName: de.lucaswerkmeister.peep.git;singleton:=true
+Bundle-Version: 1.0.0.0
+Bundle-Activator: de.lucaswerkmeister.peep.git.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ de.lucaswerkmeister.peep.core,
+ org.eclipse.egit;bundle-version="2.1.0",
+ org.eclipse.egit.core;bundle-version="2.1.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
