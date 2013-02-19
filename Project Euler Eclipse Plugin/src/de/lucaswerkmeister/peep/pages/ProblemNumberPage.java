@@ -1,4 +1,4 @@
-package de.lucaswerkmeister.code.peep.pages;
+package de.lucaswerkmeister.peep.pages;
 
 import java.text.NumberFormat;
 

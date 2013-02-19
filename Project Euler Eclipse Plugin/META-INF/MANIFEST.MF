@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
-Bundle-SymbolicName: de.lucaswerkmeister.code.peep.plugin;singleton:=true
+Bundle-SymbolicName: de.lucaswerkmeister.peep.core;singleton:=true
 Bundle-Version: 1.0.1.2
-Bundle-Activator: de.lucaswerkmeister.code.peep.Activator
+Bundle-Activator: de.lucaswerkmeister.peep.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -11,6 +11,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Export-Package: de.lucaswerkmeister.code.peep,
- de.lucaswerkmeister.code.peep.pages,
- de.lucaswerkmeister.code.peep.wizards
+Export-Package: de.lucaswerkmeister.peep,
+ de.lucaswerkmeister.peep.pages,
+ de.lucaswerkmeister.peep.wizards

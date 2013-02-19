@@ -25,7 +25,7 @@
       </category>
       <wizard
             category="Project_Euler_Eclipse_Plugin"
-            class="de.lucaswerkmeister.code.peep.wizards.NewProblemWizard"
+            class="de.lucaswerkmeister.peep.wizards.NewProblemWizard"
             icon="icons/pe_new.png"
             id="de.lucaswerkmeister.code.peep.wizards.NewProblemWizard"
             name="%wizard.name">
