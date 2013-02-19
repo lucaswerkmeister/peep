@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="de.lucaswerkmeister.peep.core.beforeCreate" name="Before file creation" schema="schema/de.lucaswerkmeister.peep.core.beforeCreate.exsd"/>
+   <extension-point id="de.lucaswerkmeister.peep.core.beforeCreate" name="Before file creation" schema="schema/de.lucaswerkmeister.peep.core.peepTask.exsd"/>
+   <extension-point id="de.lucaswerkmeister.peep.core.afterCreate" name="After file creation" schema="schema/de.lucaswerkmeister.peep.core.peepTask.exsd"/>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
