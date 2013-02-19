@@ -2,7 +2,7 @@
 <feature
       id="de.lucaswerkmeister.peep.git.feature"
       label="Project Euler Eclipse Feature – Git"
-      version="1.0.0.1">
+      version="1.0.0.2">
 
    <description url="http://www.example.com/description">
       The Project Euler Eclipse Git Feature includes a plugin to manage Git productivity when working on Project Euler.

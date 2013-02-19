@@ -4,5 +4,5 @@
       This update site contains the Project Euler Eclipse plugins.
    </description>
    <feature url="features/de.lucaswerkmeister.peep.core.feature_1.0.2.1.jar" id="de.lucaswerkmeister.peep.core.feature" version="1.0.2.1"/>
-   <feature url="features/de.lucaswerkmeister.peep.git.feature_1.0.0.1.jar" id="de.lucaswerkmeister.peep.git.feature" version="1.0.0.1"/>
+   <feature url="features/de.lucaswerkmeister.peep.git.feature_1.0.0.2.jar" id="de.lucaswerkmeister.peep.git.feature" version="1.0.0.2"/>
 </site>
