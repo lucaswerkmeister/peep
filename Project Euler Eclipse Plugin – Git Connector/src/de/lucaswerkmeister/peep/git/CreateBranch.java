@@ -1,8 +1,8 @@
 package de.lucaswerkmeister.peep.git;
 
+import java.io.IOException;
+
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.egit.core.project.RepositoryFinder;
 import org.eclipse.egit.core.project.RepositoryMapping;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -15,12 +15,14 @@ public class CreateBranch implements PeepTask {
 	@Override
 	public void execute(IProject project, int problemNumber) {
 		try {
-			RepositoryMapping m = new RepositoryFinder(project).find(null).iterator().next();
-			Repository r = m.getRepository();
-			Git git = new Git(r);
-			git.checkout().setName("Problem" + String.format("%03d", problemNumber)).setCreateBranch(true).call();
+			Repository repo = RepositoryMapping.getMapping(project).getRepository();
+			Git git = new Git(repo);
+			String branchName = "Problem" + String.format("%03d", problemNumber);
+			if (repo.getRef(branchName) == null)
+				git.branchCreate().setStartPoint("master").setName(branchName).setForce(true).call();
+			git.checkout().setName(branchName).call();
 		}
-		catch (CoreException | GitAPIException e) {
+		catch (GitAPIException | IOException e) {
 			e.printStackTrace();
 		}
 	}
