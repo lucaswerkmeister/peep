@@ -20,7 +20,7 @@ public class CommitNewFile implements CreateTask {
 			Git git = new Git(repo);
 			String problemString = "Problem" + String.format("%03d", problemNumber);
 			IPath path = file.getFullPath().makeRelativeTo(new Path(repo.getDirectory().getPath()));
-			git.add().addFilepattern(path.toString()).call();
+			git.add().addFilepattern(path.toString().substring(1)).call(); // .substring(1) to remove leading '/'
 			git.commit().setMessage("Initial commit for " + problemString + ".").call();
 		}
 		catch (GitAPIException e) {
