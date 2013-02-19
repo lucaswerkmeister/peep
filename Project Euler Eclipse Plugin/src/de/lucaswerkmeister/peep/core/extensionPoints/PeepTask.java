@@ -1,4 +1,4 @@
-package de.lucaswerkmeister.peep.extensionPoints;
+package de.lucaswerkmeister.peep.core.extensionPoints;
 
 import org.eclipse.core.resources.IProject;
 

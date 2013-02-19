@@ -8,7 +8,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 
-import de.lucaswerkmeister.peep.extensionPoints.PeepTask;
+import de.lucaswerkmeister.peep.core.extensionPoints.PeepTask;
 
 public class CreateBranch implements PeepTask {
 

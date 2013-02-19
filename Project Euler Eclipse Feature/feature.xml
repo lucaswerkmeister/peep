@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="de.lucaswerkmeister.peep.feature"
+      id="de.lucaswerkmeister.peep.core.feature"
       label="Project Euler Eclipse Feature"
       version="1.0.1.2">
 

@@ -1,4 +1,4 @@
-package de.lucaswerkmeister.peep.wizards;
+package de.lucaswerkmeister.peep.core.wizards;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
@@ -38,8 +38,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
-import de.lucaswerkmeister.peep.extensionPoints.PeepTask;
-import de.lucaswerkmeister.peep.pages.ProblemNumberPage;
+import de.lucaswerkmeister.peep.core.extensionPoints.PeepTask;
+import de.lucaswerkmeister.peep.core.pages.ProblemNumberPage;
 
 /**
  * This wizard creates a new class from a user-defined template in the same directory by replacing certain tags of said

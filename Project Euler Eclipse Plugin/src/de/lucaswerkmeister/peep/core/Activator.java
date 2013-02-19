@@ -1,4 +1,4 @@
-package de.lucaswerkmeister.peep;
+package de.lucaswerkmeister.peep.core;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
