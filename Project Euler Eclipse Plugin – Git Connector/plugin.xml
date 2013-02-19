@@ -10,7 +10,7 @@
    <extension
          point="de.lucaswerkmeister.peep.core.afterCreate">
       <client
-            class="CommitNewFile">
+            class="de.lucaswerkmeister.peep.git.CommitNewFile">
       </client>
    </extension>
 
