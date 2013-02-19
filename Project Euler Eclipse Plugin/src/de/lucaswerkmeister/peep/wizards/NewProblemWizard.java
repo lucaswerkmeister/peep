@@ -12,6 +12,7 @@ import java.util.Scanner;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -80,11 +81,12 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 		final String containerName = page.getContainerName();
 		final String fileName = page.getFileName();
 		final int problemNumber = page.getProblemNumber();
+		final IProject project = page.getProject();
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor)
 					throws InvocationTargetException {
 				try {
-					doFinish(containerName, fileName, problemNumber, monitor);
+					doFinish(project, containerName, fileName, problemNumber, monitor);
 				}
 				catch (CoreException e) {
 					throw new InvocationTargetException(e);
@@ -109,7 +111,7 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 		return true;
 	}
 
-	private void runTasks(final String extensionPointId, final int problemNumber) {
+	private void runTasks(final String extensionPointId, final IProject project, final int problemNumber) {
 		for (IConfigurationElement e : Platform.getExtensionRegistry().getConfigurationElementsFor(extensionPointId)) {
 			final Object extension;
 			try {
@@ -122,7 +124,7 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 				SafeRunner.run(new ISafeRunnable() {
 					@Override
 					public void run() throws Exception {
-						((PeepTask) extension).execute(problemNumber);
+						((PeepTask) extension).execute(project, problemNumber);
 					}
 
 					@Override
@@ -137,12 +139,12 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	 * The worker method. It will find the container, create the file if missing or just replace its contents, and open
 	 * the editor on the newly created file.
 	 */
-	private void doFinish(String containerName, String fileName,
+	private void doFinish(IProject project, String containerName, String fileName,
 			int problemNumber, IProgressMonitor monitor) throws CoreException {
 		// create a sample file
 		monitor.beginTask("Creating " + fileName, 4);
 		monitor.setTaskName("Running extensions");
-		runTasks(BEFORE_CREATE_ID, problemNumber);
+		runTasks(BEFORE_CREATE_ID, project, problemNumber);
 		monitor.worked(1);
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IResource resource = root.findMember(new Path(containerName));
@@ -165,7 +167,7 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 		}
 		monitor.worked(1);
 		monitor.setTaskName("Running extensions");
-		runTasks(AFTER_CREATE_ID, problemNumber);
+		runTasks(AFTER_CREATE_ID, project, problemNumber);
 		getShell().getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				IWorkbenchPage page = PlatformUI.getWorkbench()

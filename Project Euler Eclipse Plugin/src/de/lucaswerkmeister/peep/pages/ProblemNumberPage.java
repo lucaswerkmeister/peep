@@ -4,6 +4,7 @@ import java.text.NumberFormat;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
@@ -23,15 +24,15 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 
 /**
- * The "New" wizard page allows setting the container for the new file as well
- * as the file name. The page will only accept file name without the extension
- * OR with the extension that matches the expected one (java).
+ * The "New" wizard page allows setting the container for the new file as well as the file name. The page will only
+ * accept file name without the extension OR with the extension that matches the expected one (java).
  */
 public class ProblemNumberPage extends WizardPage {
-	private Spinner problemNumber;
-	private IPath containerPath;
+	private Spinner		problemNumber;
+	private IPath		containerPath;
+	private IProject	project;
 
-	private ISelection selection;
+	private ISelection	selection;
 
 	/**
 	 * Constructor for ProblemNumberPage.
@@ -108,14 +109,20 @@ public class ProblemNumberPage extends WizardPage {
 			if (ssel.size() > 1)
 				return;
 			Object obj = ssel.getFirstElement();
-			if (obj instanceof IPackageFragment)
+			if (obj instanceof IPackageFragment) {
 				containerPath = ((IPackageFragment) obj).getPath();
-			else if (obj instanceof IFolder)
+				project = ((IPackageFragment) obj).getJavaProject().getProject();
+			}
+			else if (obj instanceof IFolder) {
 				containerPath = ((IFolder) obj).getFullPath()
 						.append("problems");
-			else if (obj instanceof IJavaProject)
+				project = ((IFolder) obj).getProject();
+			}
+			else if (obj instanceof IJavaProject) {
 				containerPath = ((IJavaProject) obj).getPath().append("src")
 						.append("problems");
+				project = ((IJavaProject) obj).getProject();
+			}
 		}
 		problemNumber.setValues(0, 0, 1000, 4, 1, 0);
 	}
@@ -170,5 +177,9 @@ public class ProblemNumberPage extends WizardPage {
 
 	public int getProblemNumber() {
 		return problemNumber.getSelection();
+	}
+
+	public IProject getProject() {
+		return project;
 	}
 }

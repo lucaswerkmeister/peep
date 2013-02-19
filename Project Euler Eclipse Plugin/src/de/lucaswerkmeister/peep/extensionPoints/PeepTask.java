@@ -1,5 +1,7 @@
 package de.lucaswerkmeister.peep.extensionPoints;
 
+import org.eclipse.core.resources.IProject;
+
 /**
  * Represents a PEEP-related task that can be executed.
  * 
@@ -11,8 +13,10 @@ public interface PeepTask {
 	/**
 	 * Executes the task.
 	 * 
+	 * @param project
+	 *            The enclosing project.
 	 * @param problemNumber
 	 *            The number of the new Project Euler Problem.
 	 */
-	public void execute(int problemNumber);
+	public void execute(IProject project, int problemNumber);
 }
