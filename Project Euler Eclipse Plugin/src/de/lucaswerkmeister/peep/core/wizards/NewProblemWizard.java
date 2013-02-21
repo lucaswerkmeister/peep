@@ -83,8 +83,7 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 		final int problemNumber = page.getProblemNumber();
 		final IProject project = page.getProject();
 		IRunnableWithProgress op = new IRunnableWithProgress() {
-			public void run(IProgressMonitor monitor)
-					throws InvocationTargetException {
+			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
 					doFinish(project, containerName, fileName, problemNumber, monitor);
 				}
@@ -104,15 +103,14 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 		}
 		catch (InvocationTargetException e) {
 			Throwable realException = e.getTargetException();
-			MessageDialog.openError(getShell(), "Error",
-					realException.getMessage());
+			MessageDialog.openError(getShell(), "Error", realException.getMessage());
 			return false;
 		}
 		return true;
 	}
 
-	private void runTasks(final String extensionPointId, final IProject project,
-			final IFile file, final int problemNumber) {
+	private void runTasks(final String extensionPointId, final IProject project, final IFile file,
+			final int problemNumber) {
 		for (IConfigurationElement e : Platform.getExtensionRegistry().getConfigurationElementsFor(extensionPointId)) {
 			final Object extension;
 			try {
@@ -140,15 +138,14 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	 * The worker method. It will find the container, create the file if missing or just replace its contents, and open
 	 * the editor on the newly created file.
 	 */
-	private void doFinish(IProject project, String containerName, String fileName,
-			int problemNumber, IProgressMonitor monitor) throws CoreException {
+	private void doFinish(IProject project, String containerName, String fileName, int problemNumber,
+			IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask("Creating " + fileName, 4);
 		monitor.setTaskName("Running extensions");
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IResource resource = root.findMember(new Path(containerName));
 		if (!resource.exists() || !(resource instanceof IContainer)) {
-			throwCoreException("Container \"" + containerName
-					+ "\" does not exist.");
+			throwCoreException("Container \"" + containerName + "\" does not exist.");
 		}
 		IContainer container = (IContainer) resource;
 		final IFile file = container.getFile(new Path(fileName));
@@ -170,8 +167,7 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 		runTasks(AFTER_CREATE_ID, project, file, problemNumber);
 		getShell().getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				IWorkbenchPage page = PlatformUI.getWorkbench()
-						.getActiveWorkbenchWindow().getActivePage();
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				try {
 					IDE.openEditor(page, file, true);
 				}
@@ -187,16 +183,15 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	 * @throws FileNotFoundException
 	 *             If the template file doesn't exist.
 	 */
-	private InputStream openContentStream(int problemNumber,
-			IContainer container, IProgressMonitor monitor) throws FileNotFoundException {
+	private InputStream openContentStream(int problemNumber, IContainer container, IProgressMonitor monitor)
+			throws FileNotFoundException {
 		String contents = null;
 		byte readTimeoutCounter = 0;
 		monitor.setTaskName("Creating file");
 		do {
 			IResource templateFile = container.findMember("/Problem.template");
 			if (templateFile == null)
-				throw new FileNotFoundException(
-						"Template file (\"Problem.template\") not found!");
+				throw new FileNotFoundException("Template file (\"Problem.template\") not found!");
 			try (Scanner scan = new Scanner(templateFile.getLocation().toFile())) {
 				scan.useDelimiter("\\Z");
 				contents = scan.next();
@@ -205,37 +200,17 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 		} while (contents == null && readTimeoutCounter < 10);
 		monitor.worked(1);
 		if (contents == null)
-			return new ByteArrayInputStream(
-					"Unable to find template file, sorry.".getBytes());
+			return new ByteArrayInputStream("Unable to find template file, sorry.".getBytes());
 		monitor.setTaskName("Decorating file");
 		if (contents.contains("&PROBLEMTEXT_HTML;")) {
 			String problemText_html = null;
 			readTimeoutCounter = 0;
 			do {
-				try (Scanner problemPageScanner = new Scanner(
-						new URL("http://www.projecteuler.net/problem="
-								+ problemNumber).openStream())) {
+				try (Scanner problemPageScanner = new Scanner(new URL("http://www.projecteuler.net/minimal="
+						+ problemNumber).openStream())) {
 					problemPageScanner.useDelimiter("\\Z");
-					String fullProblem = problemPageScanner.next();
 
-					String problemWithoutStart = fullProblem
-							.substring(fullProblem
-									.indexOf("<div class=\"problem_content\" role=\"problem\">")
-									+ "<div class=\"problem_content\" role=\"problem\">"
-											.length());
-
-					int index;
-					// deal with inner DIVs
-					for (index = problemWithoutStart.indexOf("</div>"); problemWithoutStart
-							.substring(0, index).contains("<div"); index = problemWithoutStart
-							.indexOf("</div>", index + 1)) {
-						problemWithoutStart = problemWithoutStart.replaceFirst(
-								"<div", ">DIV");
-					}
-					problemText_html = problemWithoutStart.substring(0, index)
-							.replaceAll(">DIV", "<div");
-
-					problemText_html = problemText_html.trim();
+					problemText_html = problemPageScanner.next();
 
 					readTimeoutCounter++;
 				}
@@ -248,32 +223,24 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 			} while (problemText_html == null && readTimeoutCounter < 10);
 			if (problemText_html == null)
 				problemText_html = "Unable to retreive problem text, sorry";
-			contents = contents.replaceAll("&PROBLEMTEXT_HTML;",
-					problemText_html);
+			contents = contents.replaceAll("&PROBLEMTEXT_HTML;", problemText_html);
 
 			// Project Euler uses small gifs for symbols like times etc; we
 			// replace them with their given 'alt'.
-			contents = contents
-					.replaceAll(
-							"<img[^>]*src='images/symbol_[^']*\\.gif'[^>]*alt='(&\\p{Alpha}*;)'[^>]*/>",
-							"$1");
+			contents = contents.replaceAll("<img[^>]*src='images/symbol_[^']*\\.gif'[^>]*alt='(&\\p{Alpha}*;)'[^>]*/>",
+					"$1");
 
 			// Replace all other image links with direct links to
 			// projecteuler.net
-			contents = contents.replaceAll(
-					"(<img[^>]*src=\")(project/[^\"]*\")",
-					"$1http://projecteuler.net/$2");
+			contents = contents.replaceAll("(<img[^>]*src=\")(project/[^\"]*\")", "$1http://projecteuler.net/$2");
 		}
 		NumberFormat n = NumberFormat.getInstance();
 		n.setMinimumIntegerDigits(3);
-		contents = contents.replaceAll("&PROBLEMNUMBER;",
-				n.format(problemNumber));
+		contents = contents.replaceAll("&PROBLEMNUMBER;", n.format(problemNumber));
 
-		contents = contents.replaceAll("&USERNAME;",
-				System.getProperty("user.name"));
+		contents = contents.replaceAll("&USERNAME;", System.getProperty("user.name"));
 
-		contents = contents.replaceAll("&PROBLEMLINK;",
-				"http://www.projecteuler.net/problem=" + problemNumber);
+		contents = contents.replaceAll("&PROBLEMLINK;", "http://www.projecteuler.net/problem=" + problemNumber);
 
 		monitor.worked(1);
 
@@ -281,8 +248,7 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 	}
 
 	private void throwCoreException(String message) throws CoreException {
-		IStatus status = new Status(IStatus.ERROR,
-				"Project_Euler_Eclipse_Plugin", IStatus.OK, message, null);
+		IStatus status = new Status(IStatus.ERROR, "Project_Euler_Eclipse_Plugin", IStatus.OK, message, null);
 		throw new CoreException(status);
 	}
 
