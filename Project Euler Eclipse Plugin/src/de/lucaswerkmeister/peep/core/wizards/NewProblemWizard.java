@@ -212,6 +212,8 @@ public class NewProblemWizard extends Wizard implements INewWizard {
 
 					problemText_html = problemPageScanner.next();
 
+					problemText_html.trim();
+
 					readTimeoutCounter++;
 				}
 				catch (MalformedURLException e) {
